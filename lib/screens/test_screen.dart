@@ -8,7 +8,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 class TestScreen extends StatefulWidget {
   final GhostType ghostType;
-
   const TestScreen({super.key, required this.ghostType});
 
   @override

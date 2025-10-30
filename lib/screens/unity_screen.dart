@@ -1,58 +1,79 @@
-// import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_embed_unity/flutter_embed_unity.dart';
-// import 'package:ghost_hunt/globals.dart';
+import 'package:ghost_hunt/globals.dart';
+import 'package:ghost_hunt/models/ghost_type.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class UnityScreen extends StatelessWidget {
-  const UnityScreen({super.key});
+class UnityScreen extends StatefulWidget {
+  final GhostType ghostType;
+
+  const UnityScreen({super.key, required this.ghostType});
+
+  @override
+  State<UnityScreen> createState() => _UnityScreenState();
+}
+
+class _UnityScreenState extends State<UnityScreen> {
+  bool _isCameraPermissionGranted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCameraPermission();
+  }
+
+  // Check for camera permission
+  Future<void> _checkCameraPermission() async {
+    final status = await Permission.camera.request(); // vragen van permissies
+    setState(() {
+      _isCameraPermissionGranted = status.isGranted;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_isCameraPermissionGranted) {
+      return const Center(
+        child: Text('Camera permission is required to proceed.'),
+      );
+    }
+
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: EmbedUnity(
-              onMessageFromUnity: (String message) {
-                // Receive message from Unity
-              },
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // Send message to Unity
-              sendToUnity(
-                "MyGameObject", // Game object name
-                "SetRotationSpeed", // Unity script function name
-                "42", // Message
-              );
-            },
-            child: const Text("Set rotation speed"),
-          ),
-        ],
+      appBar: AppBar(title: const Text("Ghost Hunt")),
+      body: Material(
+        color: const Color.fromARGB(255, 76, 203, 203),
+        child: EmbedUnity(
+          onMessageFromUnity: (String message) {
+            if (message == "scene_loaded") {
+              _sendLocation();
+              _sendUsername();
+            }
+          },
+        ),
       ),
     );
   }
 
-  // // Send chosen location to Unity!
-  // void _sendLocation() {
-  //   // moet de naam van het gameobject zijn, niet de naam van het script
-  //   // de naam van de method
-  //   // het object als string
-  //   sendToUnity(
-  //     "TargetLocation",
-  //     "ReceiveTargetJson",
-  //     jsonEncode(widget.location.toJson()),
-  //   );
-  // }
+  // Send chosen location to Unity!
+  void _sendLocation() {
+    // moet de naam van het gameobject zijn, niet de naam van het script
+    // de naam van de method
+    // het object als string
+    sendToUnity(
+      "TargetLocation",
+      "ReceiveTargetJson",
+      jsonEncode(widget.ghostType.toJson()),
+    );
+  }
 
-  // // Send username to Unity!
-  // void _sendUsername() {
-  //   sendToUnity("CurrentUser", "SetUsername", globalUsername!);
-  // }
+  // Send username to Unity!
+  void _sendUsername() {
+    sendToUnity("CurrentUser", "SetUsername", globalUsername!);
+  }
 
-  // void onUnityMessage(message) {
-  //   print('RECEIVED MESSAGE FROM UNITY: ${message.toString()}');
-  // }
+  void onUnityMessage(message) {
+    print('RECEIVED MESSAGE FROM UNITY: ${message.toString()}');
+  }
 }
