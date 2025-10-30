@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class BackgroundImage extends StatelessWidget {
-  const BackgroundImage({super.key});
+class ColourBackgroundWidget extends StatelessWidget {
+  const ColourBackgroundWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +13,7 @@ class BackgroundImage extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Center(
-        child: Image(
-          image: AssetImage('assets/images/achtergrond.png'),
-          fit: BoxFit.contain,
-        ),
-      ),
+      // child: Scaffold(body: const Center(child: Text('ListScreen'))),
     );
   }
 }
