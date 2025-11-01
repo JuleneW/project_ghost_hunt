@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ghost_hunt/models/ghost_type.dart';
+import 'package:ghost_hunt/models/inventory_item.dart';
+import 'package:ghost_hunt/models/player.dart';
 import 'package:ghost_hunt/widgets/colour_background_widget.dart';
 // import 'package:ghost_hunt/widgets/ghost_hunt_appbar.dart';
 import 'package:ghost_hunt/widgets/ghost_list_widget.dart';
@@ -8,7 +10,14 @@ import 'package:ghost_hunt/widgets/profile_widget.dart';
 import 'package:ghost_hunt/apis/ghostType.api.dart';
 
 class ListScreen extends StatefulWidget {
-  const ListScreen({super.key});
+  final Player player;
+  final List<InventoryItem> inventoryItems;
+
+  const ListScreen({
+    super.key,
+    required this.player,
+    required this.inventoryItems,
+  });
 
   @override
   State<ListScreen> createState() => _ListScreenState();
@@ -16,11 +25,16 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   late Future<List<GhostType>> _futureGhosts;
+  late final Set<int> _caughtGhostTypeIds;
 
   @override
   void initState() {
     super.initState();
-    _futureGhosts = GhostTypeApi.fetchGhostTypes(); // HTTP call
+    _futureGhosts = GhostTypeApi.fetchGhostTypes();
+    // make a fast lookup set: which ghosts are already catched
+    _caughtGhostTypeIds = widget.inventoryItems
+        .map((e) => e.ghostTypeId)
+        .toSet();
   }
 
   @override
@@ -32,7 +46,7 @@ class _ListScreenState extends State<ListScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             // GhostHuntAppbar(),
-            ProfileWidget(),
+            ProfileWidget(player: widget.player),
             ListInfoWidget(),
             Expanded(
               flex: 2,
@@ -46,7 +60,10 @@ class _ListScreenState extends State<ListScreen> {
                     return const Center(child: Text('Error loading ghosts'));
                   }
                   final ghosts = snapshot.data ?? [];
-                  return GhostListWidget(ghosts: ghosts);
+                  return GhostListWidget(
+                    ghosts: ghosts,
+                    caughtGhostTypeIds: _caughtGhostTypeIds,
+                  );
                 },
               ),
               // ],

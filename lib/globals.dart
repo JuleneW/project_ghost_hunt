@@ -8,6 +8,6 @@ String? globalUsername;
 // It hot-reloads when you edit db.json.
 
 // String server = "http://localhost:8084";
-String server = "http://localhost:3000";
+// String server = "http://localhost:3000";
 // start localTunnel (correct port) for smartphone and copy url: lt --port 3000
-String mobileServer = 'https://full-cycles-attack.loca.lt';
+String server = 'https://bitter-roses-return.loca.lt';
