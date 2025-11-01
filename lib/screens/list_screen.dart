@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:ghost_hunt/models/ghost_type.dart';
 import 'package:ghost_hunt/widgets/colour_background_widget.dart';
 // import 'package:ghost_hunt/widgets/ghost_hunt_appbar.dart';
 import 'package:ghost_hunt/widgets/ghost_list_widget.dart';
 import 'package:ghost_hunt/widgets/list_info_widget.dart';
 import 'package:ghost_hunt/widgets/profile_widget.dart';
+import 'package:ghost_hunt/apis/ghostType.api.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({super.key});
@@ -13,6 +15,14 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
+  late Future<List<GhostType>> _futureGhosts;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureGhosts = GhostTypeApi.fetchGhostTypes(); // HTTP call
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -24,12 +34,26 @@ class _ListScreenState extends State<ListScreen> {
             // GhostHuntAppbar(),
             ProfileWidget(),
             ListInfoWidget(),
-            Expanded(flex: 2, child: GhostListWidget()),
+            Expanded(
+              flex: 2,
+              child: FutureBuilder<List<GhostType>>(
+                future: _futureGhosts,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return const Center(child: Text('Error loading ghosts'));
+                  }
+                  final ghosts = snapshot.data ?? [];
+                  return GhostListWidget(ghosts: ghosts);
+                },
+              ),
+              // ],
+            ),
           ],
         ),
       ],
     );
-    //   ],
-    // );
   }
 }

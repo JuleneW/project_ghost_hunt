@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:ghost_hunt/models/ghost_type.dart';
 import 'package:ghost_hunt/screens/unity_screen.dart';
 
-class GhostCard extends StatefulWidget {
-  const GhostCard({super.key});
+class GhostCard extends StatelessWidget {
+  final GhostType ghost;
 
-  @override
-  State<GhostCard> createState() => _GhostCardState();
-}
+  const GhostCard({super.key, required this.ghost});
 
-class _GhostCardState extends State<GhostCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -23,23 +20,24 @@ class _GhostCardState extends State<GhostCard> {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
+              // IMAGE
               Padding(
                 padding: const EdgeInsets.all(1.0),
                 child: Container(
-                  // width: 180,
                   height: 80,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
                   child: Expanded(
-                    child: Image.asset('assets/images/spirit.png'),
+                    child: Image.asset(
+                      ghost.imageUrl ?? 'assets/images/spirit.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
-              //     ],
-              //   ),
-              // ),
+              // TEXT + BUTTON
               Expanded(
                 flex: 2,
                 child: Column(
@@ -49,9 +47,8 @@ class _GhostCardState extends State<GhostCard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Ghostname',
-                          // textScaler: TextScaler.linear(1),
-                          style: TextStyle(
+                          ghost.name ?? 'Ghost name',
+                          style: const TextStyle(
                             color: Colors.white,
                             decoration: TextDecoration.none,
                             fontSize: 20,
@@ -59,13 +56,13 @@ class _GhostCardState extends State<GhostCard> {
                         ),
                       ],
                     ),
-                    // const SizedBox(height: 8),
+                    // RARITY
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Rarity',
-                          style: TextStyle(
+                          ghost.rarity ?? 'Rarity',
+                          style: const TextStyle(
                             color: Colors.white,
                             decoration: TextDecoration.none,
                             fontSize: 15,
@@ -73,7 +70,7 @@ class _GhostCardState extends State<GhostCard> {
                         ),
                       ],
                     ),
-                    // const SizedBox(height: 8),
+                    // BUTTON
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -82,12 +79,8 @@ class _GhostCardState extends State<GhostCard> {
                             Navigator.push(
                               context,
                               MaterialPageRoute<void>(
-                                builder: (context) => UnityScreen(
-                                  ghostType: GhostType(
-                                    id: '1',
-                                    spawnLocations: [],
-                                  ),
-                                ),
+                                builder: (context) =>
+                                    UnityScreen(ghostType: ghost),
                               ),
                             );
                           },
